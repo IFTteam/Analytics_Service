@@ -9,8 +9,9 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 @Configuration
 public class ProjectSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
-    protected void configure(HttpSecurity http) throws Exception{
-        http.authorizeRequests().anyRequest().permitAll().and().formLogin().and().httpBasic();
+    protected void configure(HttpSecurity https) throws Exception{
+        https.authorizeRequests().anyRequest().permitAll().and().formLogin().and().httpBasic();
+        https.cors().and().csrf().disable();
     }
 
     @Override

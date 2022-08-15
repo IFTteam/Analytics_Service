@@ -1,23 +1,28 @@
 package com.dukejiang.email_analytics.model.event_payload;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.math.BigInteger;
 
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EventDetail {
     @JsonProperty("transmission_id")
-    private int transmission_id;
+    private String transmissionId;
 
     @JsonProperty("type")
     private String type;
 
     @JsonProperty("rcpt_to")
-    private String audience_email;
+    private String audienceEmail;
+
 
 }

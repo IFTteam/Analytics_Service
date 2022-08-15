@@ -47,3 +47,7 @@ VALUES ("2022-08-10 12:14:53","Duke","click",1,"yuxuanjiang@uchicago.edu");
 
 INSERT INTO audience_activity (created_at, created_by, event_type, audience_id, audience_email)
 VALUES ("2022-08-12 13:14:53","Duke","open",1,"yuxuanjiang@uchicago.edu");
+
+-- create transmission
+INSERT INTO email_automation.transmission(id, created_at, created_by, audience_id, audience_email, user_id)
+VALUE (3, "2022-08-10 12:14:53", "Duke", 1, "yuxuanjiang@uchicago.edu", 2);

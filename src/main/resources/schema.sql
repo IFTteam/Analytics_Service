@@ -227,7 +227,7 @@ CREATE TABLE IF NOT EXISTS `audience_activity`(
 )Engine=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `transmission`(
-  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `id` BIGINT PRIMARY KEY,
   `created_at` TIMESTAMP NOT NULL,
   `created_by` VARCHAR(255) NOT NULL,
   `updated_at` TIMESTAMP DEFAULT NULL,

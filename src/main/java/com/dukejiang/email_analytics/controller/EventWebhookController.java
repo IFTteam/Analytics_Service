@@ -8,15 +8,17 @@ import com.dukejiang.email_analytics.model.event_payload.Event;
 import com.dukejiang.email_analytics.repository.AudienceActivityRepository;
 import com.dukejiang.email_analytics.repository.AudienceRepository;
 import com.dukejiang.email_analytics.repository.TransmissionRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -38,21 +40,30 @@ public class EventWebhookController {
     //respond to incoming webhook, uses transmission id to query transmission entity, get audience_id
     //and audience_email. Then insert into audience_activity table
     @RequestMapping(value = "/eventWebhook", method = POST)
-    public ResponseEntity<Response> handleEventWebhook(RequestEntity<Event> requestEntity){
+    public ResponseEntity<Response> handleEventWebhook(HttpEntity<String> httpEntity) throws JsonProcessingException {
+        //if(event.getDetails() == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response());
+        String json = httpEntity.getBody();
         log.info("Received event payload from SparkPost");
-        HttpHeaders headers = requestEntity.getHeaders();
-        Event event = requestEntity.getBody();
+        Event event = new ObjectMapper().readerFor(Event.class).readValue(json);
+//        int transmissionId = event.getDetails().get("transmission_id").asInt();
+//        String eventType = event.getDetails().get("type").asText();
+//        int transmissionId = Integer.parseInt(event.getDetails().get("transmission_id").toString());
+//        String eventType = event.getDetails().get("type").toString();
+        String transmissionId = event.getMsys().getEventDetail().getTransmissionId();
+        String eventType = event.getMsys().getEventDetail().getType();
+        log.info("Transmission id is " + transmissionId);
 
         //find corresponding transmission_id
-        assert event != null;
         Optional<Transmission> transmission = transmissionRepository
-                                                .findById(event.getEventDetail().getTransmission_id());
+                                                .findById(transmissionId);
         assert transmission.isPresent(); // check is not null
         Audience audience = transmission.get().getAudience();
         AudienceActivity audienceActivity = new AudienceActivity();
         audienceActivity.setAudience(audience);
-        audienceActivity.setEventType(event.getEventDetail().getType());
+        audienceActivity.setEventType(eventType);
         audienceActivity.setAudience_email(audience.getEmail());
+        audienceActivity.setCreatedAt(LocalDateTime.now());
+        audienceActivity.setCreatedBy("SparkPost");
         audienceActivityRepository.save(audienceActivity);
 
         // Spark post requires 200 status code
